@@ -5,7 +5,17 @@
 const STUDY_SECONDS = 15 * 60;
 const EXPLAIN_SECONDS = 60;
 const RING_CIRCUMFERENCE = 2 * Math.PI * 118;
-const STORAGE_KEY = "minuetto_used_topics";
+const LEVEL_KEY = "minuetto_level";
+const usedKey = (level) => `minuetto_used_${level}`;
+
+const LEVEL_TIPS = {
+  facile:
+    "🔎 Cerca su Google, YouTube o un buon libro divulgativo. Niente AI: occhi, orecchie e appunti!",
+  intermedio:
+    "🔎 Servono fonti solide: manuali, enciclopedie musicali, articoli seri. Niente AI, niente copia-incolla.",
+  esperto:
+    "🔎 Cerca su Google Scholar, non su Google. Fonti accademiche, appunti a mano, cervello acceso.",
+};
 
 const $ = (id) => document.getElementById(id);
 
@@ -17,6 +27,8 @@ const screens = {
 };
 
 let activeFilters = new Set(Object.keys(CATEGORIES));
+let currentLevel = localStorage.getItem(LEVEL_KEY);
+if (!LEVELS[currentLevel]) currentLevel = "facile";
 let currentTopic = null;
 let currentTopicIndex = null;
 
@@ -38,7 +50,7 @@ function showScreen(name) {
 
 function getUsed() {
   try {
-    const raw = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const raw = JSON.parse(localStorage.getItem(usedKey(currentLevel)));
     return Array.isArray(raw) ? raw : [];
   } catch {
     return [];
@@ -49,23 +61,51 @@ function markUsed(index) {
   const used = getUsed();
   if (!used.includes(index)) {
     used.push(index);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(used));
+    localStorage.setItem(usedKey(currentLevel), JSON.stringify(used));
   }
   refreshUsedInfo();
 }
 
 function resetUsed() {
-  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem(usedKey(currentLevel));
   refreshUsedInfo();
   refreshDeckInfo();
 }
 
 function refreshUsedInfo() {
   const n = getUsed().length;
+  const lv = LEVELS[currentLevel];
+  const total = TOPICS.filter((t) => t.l === currentLevel).length;
   $("used-info").textContent =
     n === 0
-      ? "Nessun argomento pescato finora: il mazzo è pieno! ✨"
-      : `Hai già pescato ${n} argoment${n === 1 ? "o" : "i"} su ${TOPICS.length}.`;
+      ? `Livello ${lv.label} ${lv.emoji}: nessun argomento pescato finora, il mazzo è pieno! ✨`
+      : `Livello ${lv.label} ${lv.emoji}: hai già pescato ${n} argoment${n === 1 ? "o" : "i"} su ${total}.`;
+}
+
+// ───────────────────────── Selettore di livello ─────────────────────────
+
+function buildLevelPicker() {
+  const wrap = $("level-picker");
+  wrap.innerHTML = "";
+  for (const [key, lv] of Object.entries(LEVELS)) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "level-option" + (key === currentLevel ? " on" : "");
+    btn.style.setProperty("--level-color", lv.color);
+    btn.innerHTML = `<span class="level-emoji">${lv.emoji}</span>
+      <span class="level-name">${lv.label}</span>
+      <span class="level-desc">${lv.desc}</span>`;
+    btn.addEventListener("click", () => {
+      currentLevel = key;
+      localStorage.setItem(LEVEL_KEY, key);
+      wrap.querySelectorAll(".level-option").forEach((b) => b.classList.remove("on"));
+      btn.classList.add("on");
+      refreshDeckInfo();
+      refreshUsedInfo();
+      playChime([659.25], 0.08);
+    });
+    wrap.appendChild(btn);
+  }
 }
 
 // ───────────────────────── Filtri per categoria ─────────────────────────
@@ -74,7 +114,7 @@ function buildChips() {
   const wrap = $("category-chips");
   wrap.innerHTML = "";
   for (const [key, cat] of Object.entries(CATEGORIES)) {
-    const count = TOPICS.filter((t) => t.c === key).length;
+    const count = TOPICS.filter((t) => t.c === key && t.l === currentLevel).length;
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = "chip on";
@@ -108,7 +148,7 @@ function availableIndexes() {
   const inFilter = [];
   const unusedInFilter = [];
   TOPICS.forEach((t, i) => {
-    if (!activeFilters.has(t.c)) return;
+    if (t.l !== currentLevel || !activeFilters.has(t.c)) return;
     inFilter.push(i);
     if (!used.has(i)) unusedInFilter.push(i);
   });
@@ -117,9 +157,10 @@ function availableIndexes() {
 }
 
 function refreshDeckInfo() {
-  const total = TOPICS.filter((t) => activeFilters.has(t.c)).length;
+  const lv = LEVELS[currentLevel];
+  const total = TOPICS.filter((t) => t.l === currentLevel && activeFilters.has(t.c)).length;
   const fresh = availableIndexes().length;
-  $("deck-info").textContent = `Nel mazzo: ${total} argomenti (${Math.min(fresh, total)} ancora da pescare).`;
+  $("deck-info").textContent = `Nel mazzo ${lv.emoji} ${lv.label}: ${total} argomenti (${Math.min(fresh, total)} ancora da pescare).`;
 }
 
 // ───────────────────────── Pesca ─────────────────────────
@@ -131,12 +172,23 @@ function drawTopic() {
   currentTopic = TOPICS[currentTopicIndex];
 
   const cat = CATEGORIES[currentTopic.c];
+  const lv = LEVELS[currentTopic.l];
   const badge = $("topic-badge");
   badge.textContent = `${cat.emoji} ${cat.label}`;
   badge.style.setProperty("--badge-color", cat.color);
+  const levelBadge = $("level-badge");
+  levelBadge.textContent = `${lv.emoji} ${lv.label}`;
+  levelBadge.style.setProperty("--badge-color", lv.color);
   $("topic-title").textContent = currentTopic.t;
-  $("scholar-link").href =
-    "https://scholar.google.com/scholar?q=" + encodeURIComponent(currentTopic.t);
+  const tip = $("topic-tip");
+  if (currentTopic.l === "esperto") {
+    tip.innerHTML =
+      '🔎 Cerca su <a href="https://scholar.google.com/scholar?q=' +
+      encodeURIComponent(currentTopic.t) +
+      '" target="_blank" rel="noopener">Google Scholar</a>, non su Google. Fonti accademiche, appunti a mano, cervello acceso.';
+  } else {
+    tip.textContent = LEVEL_TIPS[currentTopic.l];
+  }
 
   // ri-innesca l'animazione della card
   const card = $("topic-card");
@@ -298,6 +350,7 @@ $("btn-reset-used").addEventListener("click", () => {
   playChime([659.25], 0.1);
 });
 
+buildLevelPicker();
 buildChips();
 buildFloatingNotes();
 refreshUsedInfo();

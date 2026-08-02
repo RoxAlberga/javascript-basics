@@ -29,11 +29,16 @@
       <div class="card rules-card">
         <h2>Come si gioca 🎶</h2>
         <ol class="rules">
-          <li><span class="rule-emoji">🎲</span><div><strong>Pesca un argomento.</strong> Sono 200, tutti seri e accademicamente indagabili: niente domande da bar.</div></li>
-          <li><span class="rule-emoji">⏳</span><div><strong>Studia per 15 minuti.</strong> Solo fonti vere: Google Scholar, JSTOR, libri, articoli. <em>Vietata l'intelligenza artificiale, vietato il copia-incolla da Wikipedia.</em></div></li>
+          <li><span class="rule-emoji">🎲</span><div><strong>Scegli il livello e pesca un argomento.</strong> Sono 600 in tutto: 200 facili, 200 intermedi e 200 da veri secchioni.</div></li>
+          <li><span class="rule-emoji">⏳</span><div><strong>Studia per 15 minuti.</strong> Solo fonti vere: libri, enciclopedie, articoli, Google Scholar. <em>Vietata l'intelligenza artificiale, vietato il copia-incolla da Wikipedia.</em></div></li>
           <li><span class="rule-emoji">🎤</span><div><strong>Spiega in 1 minuto.</strong> A un'amica, a un gruppo, alla webcam. Chiaro, denso, senza leggere.</div></li>
         </ol>
         <p class="rules-note">💡 In gruppo: a turno si pesca, si studia in silenzio e chi ascolta vota la spiegazione più chiara. In solitaria: registrati e riascoltati!</p>
+      </div>
+
+      <div class="card level-card">
+        <h2>Scegli il livello 🎚️</h2>
+        <div id="level-picker" class="levels"></div>
       </div>
 
       <div class="card filter-card">
@@ -54,10 +59,13 @@
     <!-- ═══════════ SCHERMATA: ARGOMENTO PESCATO ═══════════ -->
     <section id="screen-topic" class="screen">
       <div class="card topic-card" id="topic-card">
-        <div class="topic-badge" id="topic-badge"></div>
+        <div class="badge-row">
+          <div class="topic-badge" id="topic-badge"></div>
+          <div class="topic-badge level-badge" id="level-badge"></div>
+        </div>
         <p class="topic-label">Il tuo argomento è…</p>
         <h2 class="topic-title" id="topic-title"></h2>
-        <p class="topic-tip">🔎 Cerca su <a id="scholar-link" href="#" target="_blank" rel="noopener">Google Scholar</a>, non su Google. Fonti accademiche, appunti a mano, cervello acceso.</p>
+        <p class="topic-tip" id="topic-tip"></p>
       </div>
       <div class="btn-row">
         <button id="btn-start-study" class="btn btn-big btn-primary"><span class="btn-emoji">⏳</span> Via ai 15 minuti!</button>
@@ -107,8 +115,8 @@
   </main>
 
   <footer>
-    <p>Fatto con 💜 per chi ama la musica sul serio · 200 argomenti · zero AI durante lo studio</p>
-    <button id="btn-reset-used" class="btn-link">Azzera gli argomenti già pescati</button>
+    <p>Fatto con 💜 per chi ama la musica sul serio · 600 argomenti · 3 livelli · zero AI durante lo studio</p>
+    <button id="btn-reset-used" class="btn-link">Azzera gli argomenti già pescati di questo livello</button>
   </footer>
 
   <div id="confetti-layer" aria-hidden="true"></div>
