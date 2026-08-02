@@ -221,13 +221,57 @@ header, main, footer { position: relative; z-index: 1; width: 100%; max-width: 6
   padding: .4rem 1rem;
 }
 .topic-label { font-size: .95rem; color: var(--ink-soft); margin-bottom: .5rem; }
+.slot-window {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 7.2rem;
+  overflow: hidden;
+  border-radius: 18px;
+  margin-bottom: 1.2rem;
+  transition: background .3s, box-shadow .3s;
+}
 .topic-title {
   font-family: "Fredoka", sans-serif;
   font-size: clamp(1.2rem, 4vw, 1.55rem);
   line-height: 1.4;
   color: var(--ink);
-  margin-bottom: 1.2rem;
+  margin: 0;
 }
+
+/* ── Slot machine: mentre gira ── */
+.topic-card.spinning .slot-window {
+  background: linear-gradient(180deg, var(--bg-2), #fff 30%, #fff 70%, var(--bg-2));
+  box-shadow: inset 0 10px 14px -10px rgba(76, 58, 99, .25),
+              inset 0 -10px 14px -10px rgba(76, 58, 99, .25);
+}
+.topic-card.spinning .topic-title { color: var(--ink-soft); }
+.topic-card.spinning .badge-row { visibility: hidden; }
+.topic-card.spinning { animation: slotShake .5s ease-in-out infinite; }
+@keyframes slotShake {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(.4deg); }
+  75%      { transform: rotate(-.4deg); }
+}
+.topic-title.rolling { animation: slotRoll .34s ease-out; }
+@keyframes slotRoll {
+  0%   { transform: translateY(105%); opacity: 0; filter: blur(3px); }
+  60%  { opacity: 1; }
+  100% { transform: translateY(0); filter: blur(0); }
+}
+
+/* ── Slot machine: atterraggio ── */
+.topic-card.landed .topic-title { animation: slotLand .55s cubic-bezier(.2, 1.6, .45, 1); }
+@keyframes slotLand {
+  0%   { transform: translateY(70%) scale(.85); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+.topic-card.landed { animation: none; }
+.topic-card.landed .badge-row { animation: pop .45s ease .1s backwards; }
+.topic-card.landed .topic-tip { animation: pop .45s ease .25s backwards; }
+
+.hidden-while-spinning { opacity: 0; pointer-events: none; }
+#topic-actions { transition: opacity .35s ease; }
 .topic-tip { font-size: .9rem; color: var(--ink-soft); line-height: 1.5; }
 .topic-tip a { color: var(--primary-dark); font-weight: 700; }
 
