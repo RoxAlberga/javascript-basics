@@ -163,14 +163,12 @@ function refreshDeckInfo() {
   $("deck-info").textContent = `Nel mazzo ${lv.emoji} ${lv.label}: ${total} argomenti (${Math.min(fresh, total)} ancora da pescare).`;
 }
 
-// ───────────────────────── Pesca ─────────────────────────
+// ───────────────────────── Pesca con animazione slot ─────────────────────────
 
-function drawTopic() {
-  const pool = availableIndexes();
-  if (pool.length === 0) return; // non dovrebbe succedere: c'è sempre almeno una categoria
-  currentTopicIndex = pool[Math.floor(Math.random() * pool.length)];
-  currentTopic = TOPICS[currentTopicIndex];
+let spinning = false;
+let spinToken = 0;
 
+function revealTopic() {
   const cat = CATEGORIES[currentTopic.c];
   const lv = LEVELS[currentTopic.l];
   const badge = $("topic-badge");
@@ -179,6 +177,7 @@ function drawTopic() {
   const levelBadge = $("level-badge");
   levelBadge.textContent = `${lv.emoji} ${lv.label}`;
   levelBadge.style.setProperty("--badge-color", lv.color);
+  $("topic-label").textContent = "Il tuo argomento è…";
   $("topic-title").textContent = currentTopic.t;
   const tip = $("topic-tip");
   if (currentTopic.l === "esperto") {
@@ -189,15 +188,70 @@ function drawTopic() {
   } else {
     tip.textContent = LEVEL_TIPS[currentTopic.l];
   }
+}
 
-  // ri-innesca l'animazione della card
+function rollTitle(text) {
+  const title = $("topic-title");
+  title.classList.remove("rolling");
+  void title.offsetWidth; // ri-innesca l'animazione
+  title.textContent = text;
+  title.classList.add("rolling");
+}
+
+function cancelSpin() {
+  spinToken++;
+  spinning = false;
+  $("topic-card").classList.remove("spinning", "landed");
+  $("topic-actions").classList.remove("hidden-while-spinning");
+}
+
+function drawTopic() {
+  if (spinning) return;
+  const pool = availableIndexes();
+  if (pool.length === 0) return; // non dovrebbe succedere: c'è sempre almeno una categoria
+  currentTopicIndex = pool[Math.floor(Math.random() * pool.length)];
+  currentTopic = TOPICS[currentTopicIndex];
+
+  spinning = true;
+  const myToken = ++spinToken;
   const card = $("topic-card");
-  card.style.animation = "none";
-  void card.offsetWidth;
-  card.style.animation = "";
-
-  playChime([523.25, 659.25, 783.99], 0.12);
+  card.classList.add("spinning");
+  card.classList.remove("landed");
+  $("topic-actions").classList.add("hidden-while-spinning");
+  $("topic-label").textContent = "🎰 Il mazzo gira, gira, gira…";
+  $("topic-tip").textContent = "Incrocia le dita! 🤞";
   showScreen("topic");
+
+  // sequenza di tick: veloci all'inizio, sempre più lenti verso la fine
+  let delay = 55;
+  let elapsed = 0;
+  const SPIN_TIME = 2700;
+
+  const tick = () => {
+    if (myToken !== spinToken) return; // spin annullato (es. tasto Indietro)
+    elapsed += delay;
+    delay *= 1.16;
+    if (elapsed >= SPIN_TIME) {
+      // atterraggio sull'argomento estratto
+      spinning = false;
+      card.classList.remove("spinning");
+      card.classList.add("landed");
+      $("topic-actions").classList.remove("hidden-while-spinning");
+      revealTopic();
+      rollTitle(currentTopic.t);
+      playChime([523.25, 659.25, 783.99, 1046.5], 0.13);
+      return;
+    }
+    // mostra un argomento a caso del mazzo (mai quello estratto, per la sorpresa)
+    let idx = pool[Math.floor(Math.random() * pool.length)];
+    if (pool.length > 1) {
+      while (idx === currentTopicIndex) idx = pool[Math.floor(Math.random() * pool.length)];
+    }
+    rollTitle(TOPICS[idx].t);
+    playTick(1 + elapsed / SPIN_TIME);
+    setTimeout(tick, delay);
+  };
+  tick();
 }
 
 // ───────────────────────── Timer ─────────────────────────
@@ -281,6 +335,25 @@ function abandonGame() {
 
 let audioCtx = null;
 
+function playTick(pitchMult = 1) {
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = "triangle";
+    osc.frequency.value = 620 * pitchMult;
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.06, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.08);
+  } catch {
+    /* audio non disponibile */
+  }
+}
+
 function playChime(freqs, noteLength) {
   try {
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
@@ -338,7 +411,10 @@ function launchConfetti() {
 
 $("btn-draw").addEventListener("click", drawTopic);
 $("btn-redraw").addEventListener("click", drawTopic);
-$("btn-back-home").addEventListener("click", () => showScreen("home"));
+$("btn-back-home").addEventListener("click", () => {
+  cancelSpin();
+  showScreen("home");
+});
 $("btn-start-study").addEventListener("click", () => startPhase("study"));
 $("btn-pause").addEventListener("click", togglePause);
 $("btn-skip").addEventListener("click", () => startPhase("explain"));
