@@ -394,11 +394,13 @@ function buildFloatingNotes() {
 
 function launchConfetti() {
   const layer = $("confetti-layer");
-  const glyphs = ["🎉", "🎊", "🎵", "🎶", "✨", "💜", "🎀"];
+  const glyphs = ["♪", "♫", "♩", "𝄞", "✦", "❦", "❧"];
+  const colors = ["#c2a05e", "#a05252", "#e7ddc9", "#8f6d38"];
   for (let i = 0; i < 36; i++) {
     const c = document.createElement("span");
     c.className = "confetto";
     c.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+    c.style.color = colors[Math.floor(Math.random() * colors.length)];
     c.style.left = `${Math.random() * 100}%`;
     c.style.animationDuration = `${2.2 + Math.random() * 2.4}s`;
     c.style.animationDelay = `${Math.random() * 0.8}s`;

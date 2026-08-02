@@ -7,23 +7,23 @@
 // ===================================================================
 
 const LEVELS = {
-  facile:     { label: "Facile",     emoji: "🌱", color: "#5e9e58",
+  facile:     { label: "Facile",     emoji: "🌱", color: "#8fae7e",
                 desc: "Curiosità e basi della musica: bastano buone fonti divulgative." },
-  intermedio: { label: "Intermedio", emoji: "🌿", color: "#e08f3c",
+  intermedio: { label: "Intermedio", emoji: "🌿", color: "#c49a63",
                 desc: "Si fa sul serio: servono manuali, enciclopedie e un po' di metodo." },
-  esperto:    { label: "Esperto",    emoji: "🌳", color: "#7c4ce0",
+  esperto:    { label: "Esperto",    emoji: "🌳", color: "#b06565",
                 desc: "Argomenti accademici tostissimi: Google Scholar, JSTOR e coraggio." },
 };
 
 const CATEGORIES = {
-  teoria:      { label: "Teoria e analisi",              emoji: "📐", color: "#7c6ff0" },
-  storia:      { label: "Storia della musica",           emoji: "🏛️", color: "#e0709b" },
-  composizione:{ label: "Armonia e composizione",        emoji: "✒️", color: "#4fa3a5" },
-  generi:      { label: "Generi e popular music",        emoji: "🎸", color: "#e08f3c" },
-  etno:        { label: "Etnomusicologia",               emoji: "🌍", color: "#5e9e58" },
-  acustica:    { label: "Acustica e psicoacustica",      emoji: "🔬", color: "#4f7fd9" },
-  organologia: { label: "Organologia e prassi esecutiva",emoji: "🎻", color: "#b0713a" },
-  musicologia: { label: "Notazione e musicologia",       emoji: "📜", color: "#9a6bb5" },
+  teoria:      { label: "Teoria e analisi",              emoji: "📐", color: "#9a8fc4" },
+  storia:      { label: "Storia della musica",           emoji: "🏛️", color: "#bf7d92" },
+  composizione:{ label: "Armonia e composizione",        emoji: "✒️", color: "#7faca9" },
+  generi:      { label: "Generi e popular music",        emoji: "🎸", color: "#c49a63" },
+  etno:        { label: "Etnomusicologia",               emoji: "🌍", color: "#8fae7e" },
+  acustica:    { label: "Acustica e psicoacustica",      emoji: "🔬", color: "#7f97bd" },
+  organologia: { label: "Organologia e prassi esecutiva",emoji: "🎻", color: "#b08a5e" },
+  musicologia: { label: "Notazione e musicologia",       emoji: "📜", color: "#a487bd" },
 };
 
 const TOPICS_ESPERTO = [
