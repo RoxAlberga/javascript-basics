@@ -111,6 +111,38 @@ header, main, footer { position: relative; z-index: 1; width: 100%; max-width: 6
   line-height: 1.5;
 }
 
+/* ── Selettore di livello ── */
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; }
+.level-option {
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .3rem;
+  text-align: center;
+  background: #fff;
+  border: 2.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 20px;
+  padding: 1rem .7rem;
+  cursor: pointer;
+  transition: all .18s ease;
+  color: var(--ink);
+}
+.level-option:hover { transform: translateY(-3px); border-color: var(--level-color); }
+.level-option.on {
+  border-color: var(--level-color);
+  background: color-mix(in srgb, var(--level-color) 10%, #fff);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--level-color) 25%, transparent);
+}
+.level-emoji { font-size: 1.7rem; }
+.level-name {
+  font-family: "Fredoka", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--level-color);
+}
+.level-desc { font-size: .78rem; color: var(--ink-soft); line-height: 1.35; }
+
 /* ── Filtri categorie ── */
 .filter-hint { font-size: .9rem; color: var(--ink-soft); margin-bottom: .8rem; }
 .chips { display: flex; flex-wrap: wrap; gap: .55rem; }
@@ -170,6 +202,13 @@ header, main, footer { position: relative; z-index: 1; width: 100%; max-width: 6
   from { transform: rotateX(70deg) scale(.9); opacity: 0; }
   to   { transform: none; opacity: 1; }
 }
+.badge-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: 1.1rem;
+}
 .topic-badge {
   display: inline-flex;
   align-items: center;
@@ -180,7 +219,6 @@ header, main, footer { position: relative; z-index: 1; width: 100%; max-width: 6
   background: var(--badge-color, var(--primary));
   border-radius: 999px;
   padding: .4rem 1rem;
-  margin-bottom: 1.1rem;
 }
 .topic-label { font-size: .95rem; color: var(--ink-soft); margin-bottom: .5rem; }
 .topic-title {
@@ -276,4 +314,7 @@ footer { text-align: center; margin-top: 2.6rem; font-size: .85rem; color: var(-
   body { padding: 1.2rem .8rem 2.4rem; }
   .card { padding: 1.4rem 1.2rem; }
   .btn-big { width: 100%; }
+  .levels { grid-template-columns: 1fr; }
+  .level-option { flex-direction: row; text-align: left; }
+  .level-option .level-desc { flex: 1; }
 }
