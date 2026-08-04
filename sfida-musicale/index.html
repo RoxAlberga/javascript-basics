@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minuetto · studia 15 minuti, spiega in 1</title>
+  <meta name="description" content="Pesca un argomento musicale accademicamente tosto, studialo per 15 minuti senza AI e spiegalo in 1 minuto. Un gioco per nerd della musica.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎼</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="floating-notes" aria-hidden="true"></div>
+
+  <header class="hero">
+    <h1 class="logo">Minuetto <span class="logo-orn">❦</span></h1>
+    <p class="tagline">Pesca un argomento musicale <em>tostissimo</em>,<br>
+      studialo per <strong>15 minuti</strong>… e spiegalo in <strong>1 minuto</strong>.</p>
+  </header>
+
+  <main>
+
+    <!-- ═══════════ SCHERMATA: HOME ═══════════ -->
+    <section id="screen-home" class="screen active">
+
+      <div class="card rules-card">
+        <h2>Come si gioca 🎶</h2>
+        <ol class="rules">
+          <li><span class="rule-emoji">🎲</span><div><strong>Scegli il livello e pesca un argomento.</strong> Sono 600 in tutto: 200 facili, 200 intermedi e 200 da veri secchioni.</div></li>
+          <li><span class="rule-emoji">⏳</span><div><strong>Studia per 15 minuti.</strong> Solo fonti vere: libri, enciclopedie, articoli, Google Scholar. <em>Vietata l'intelligenza artificiale, vietato il copia-incolla da Wikipedia.</em></div></li>
+          <li><span class="rule-emoji">🎤</span><div><strong>Spiega in 1 minuto.</strong> A un'amica, a un gruppo, alla webcam. Chiaro, denso, senza leggere.</div></li>
+        </ol>
+        <p class="rules-note">💡 In gruppo: a turno si pesca, si studia in silenzio e chi ascolta vota la spiegazione più chiara. In solitaria: registrati e riascoltati!</p>
+      </div>
+
+      <div class="card level-card">
+        <h2>Scegli il livello 🎚️</h2>
+        <div id="level-picker" class="levels"></div>
+      </div>
+
+      <div class="card filter-card">
+        <h2>Scegli il tuo mazzo 🃏</h2>
+        <p class="filter-hint">Tocca le categorie per includerle o escluderle.</p>
+        <div id="category-chips" class="chips"></div>
+        <p id="deck-info" class="deck-info"></p>
+      </div>
+
+      <button id="btn-draw" class="btn btn-big btn-primary">
+        <span class="btn-emoji">🎲</span> Pescami un argomento!
+      </button>
+
+      <p id="used-info" class="used-info"></p>
+
+    </section>
+
+    <!-- ═══════════ SCHERMATA: ARGOMENTO PESCATO ═══════════ -->
+    <section id="screen-topic" class="screen">
+      <div class="card topic-card" id="topic-card">
+        <div class="badge-row">
+          <div class="topic-badge" id="topic-badge"></div>
+          <div class="topic-badge level-badge" id="level-badge"></div>
+        </div>
+        <p class="topic-label" id="topic-label">Il tuo argomento è…</p>
+        <div class="slot-window">
+          <h2 class="topic-title" id="topic-title"></h2>
+        </div>
+        <p class="topic-tip" id="topic-tip"></p>
+      </div>
+      <div class="btn-row" id="topic-actions">
+        <button id="btn-start-study" class="btn btn-big btn-primary"><span class="btn-emoji">⏳</span> Via ai 15 minuti!</button>
+        <button id="btn-redraw" class="btn btn-ghost">🔁 Ripesca</button>
+        <button id="btn-back-home" class="btn btn-ghost">← Indietro</button>
+      </div>
+    </section>
+
+    <!-- ═══════════ SCHERMATA: TIMER ═══════════ -->
+    <section id="screen-timer" class="screen">
+      <div class="card timer-card" id="timer-card">
+        <p class="phase-label" id="phase-label">📚 Fase di studio</p>
+        <p class="timer-topic" id="timer-topic"></p>
+
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 260 260" aria-hidden="true">
+            <circle class="ring-bg" cx="130" cy="130" r="118"/>
+            <circle class="ring-fg" id="ring-fg" cx="130" cy="130" r="118"/>
+          </svg>
+          <div class="timer-display" id="timer-display" role="timer" aria-live="polite">15:00</div>
+        </div>
+
+        <p class="phase-hint" id="phase-hint">Niente AI, niente scorciatoie. Scholar, libri e appunti. 💪</p>
+
+        <div class="btn-row">
+          <button id="btn-pause" class="btn btn-secondary">⏸️ Pausa</button>
+          <button id="btn-skip" class="btn btn-ghost">⏭️ Ho finito, passa alla spiegazione</button>
+          <button id="btn-abandon" class="btn btn-ghost btn-danger">✖️ Abbandona</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════ SCHERMATA: FINE ═══════════ -->
+    <section id="screen-done" class="screen">
+      <div class="card done-card">
+        <div class="done-emoji">❧ 𝄞 ❦</div>
+        <h2>Tempo scaduto, standing ovation!</h2>
+        <p class="done-topic" id="done-topic"></p>
+        <p class="done-text">Com'è andata la spiegazione? Se chi ti ascoltava ha capito <em>e</em> ha imparato qualcosa, hai vinto il round. 🏆</p>
+        <div class="btn-row">
+          <button id="btn-again" class="btn btn-big btn-primary"><span class="btn-emoji">🎲</span> Nuovo argomento!</button>
+          <button id="btn-done-home" class="btn btn-ghost">🏠 Torna all'inizio</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <a class="telegram-link" href="https://t.me/conversazioneroxalberga" target="_blank" rel="noopener">
+      💬 Unisciti alla community su Telegram
+    </a>
+    <p class="credits">Un'idea di <strong>Rox Alberga</strong> · sito realizzato con <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a></p>
+    <p>Fatto con 💜 per chi ama la musica sul serio · 600 argomenti · 3 livelli · zero AI durante lo studio</p>
+    <button id="btn-reset-used" class="btn-link">Azzera gli argomenti già pescati di questo livello</button>
+  </footer>
+
+  <div id="confetti-layer" aria-hidden="true"></div>
+
+  <script src="topics.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
